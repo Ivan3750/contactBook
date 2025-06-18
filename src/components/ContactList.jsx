@@ -1,29 +1,36 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {  deleteContact } from "../redux/contactsSlice";
+import { deleteContact, fetchContacts } from "../redux/contactsSlice";
 import { MdAccountCircle } from "react-icons/md";
 
 const ContactList = () => {
-  const contacts = useSelector(state => state.contacts);
+  const { items, isLoading, error } = useSelector(state => state.contacts);
   const filterValue = useSelector(state => state.filter);
   const dispatch = useDispatch();
 
-  const filtered = contacts.filter(contact =>
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
+  const filtered = items.filter(contact =>
     contact.name.toLowerCase().includes(filterValue.toLowerCase())
   );
 
+  if (isLoading) return <p>Loading contacts...</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
+
   return (
     <ul className="space-y-3 mt-4">
-      {filtered.map(({ id, name, number }) => (
+      {filtered.map(({ id, name, phone }) => (
         <li
           key={id}
-          className="bg-white  p-4 rounded-xl flex items-center justify-between transition border"
+          className="bg-white p-4 rounded-xl flex items-center justify-between transition border"
         >
           <div className="flex items-center space-x-3">
             <MdAccountCircle className="text-[40px] text-blue-500" />
             <div>
               <p className="text-lg font-semibold text-gray-800">{name}</p>
-              <p className="text-sm text-gray-500">{number}</p>
+              <p className="text-sm text-gray-500">{phone}</p>
             </div>
           </div>
           <button

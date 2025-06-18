@@ -4,28 +4,23 @@ import { addContact } from "../redux/contactsSlice";
 
 const ContactForm = () => {
   const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
-  const contacts = useSelector(state => state.contacts);
+  const [phone, setPhone] = useState("");
+  const { items } = useSelector(state => state.contacts);
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
 
-    const isExist = contacts.some(contact => contact.name.toLowerCase() === name.toLowerCase());
+    const isExist = items.some(contact => contact.name.toLowerCase() === name.toLowerCase());
     if (isExist) {
       alert(`${name} вже є у контактах`);
       return;
     }
 
-    const newContact = {
-      id: Date.now(),
-      name,
-      number
-    };
+    dispatch(addContact({ name, phone }));
 
-    dispatch(addContact(newContact));
     setName("");
-    setNumber("");
+    setPhone("");
   };
 
   return (
@@ -39,11 +34,11 @@ const ContactForm = () => {
         className="border border-gray-300 rounded-md p-2 "
       />
       <input
-        value={number}
-        onChange={e => setNumber(e.target.value)}
+        value={phone}
+        onChange={e => setPhone(e.target.value)}
         placeholder="Номер телефону"
         required
-        type="phone"
+        type="tel"
         className="border border-gray-300 rounded-md p-2  "
       />
       <button

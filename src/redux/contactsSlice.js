@@ -5,9 +5,12 @@ export const fetchContacts = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const res = await fetch("https://684ef97bf0c9c9848d29bc38.mockapi.io/contacts");
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       return await res.json();
     } catch (err) {
-      return thunkAPI.rejectWithValue(err);
+      return thunkAPI.rejectWithValue(err.message || String(err));
     }
   }
 );
@@ -21,9 +24,12 @@ export const addContact = createAsyncThunk(
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contact),
       });
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       return await res.json();
     } catch (err) {
-      return thunkAPI.rejectWithValue(err);
+      return thunkAPI.rejectWithValue(err.message || String(err));
     }
   }
 );
@@ -35,9 +41,12 @@ export const deleteContact = createAsyncThunk(
       const res = await fetch(`https://684ef97bf0c9c9848d29bc38.mockapi.io/contacts/${contactId}`, {
         method: "DELETE",
       });
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       return contactId;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err);
+      return thunkAPI.rejectWithValue(err.message || String(err));
     }
   }
 );
@@ -64,6 +73,7 @@ const contactsSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
+
       .addCase(addContact.pending, state => {
         state.isLoading = true;
         state.error = null;
@@ -76,6 +86,7 @@ const contactsSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
+
       .addCase(deleteContact.pending, state => {
         state.isLoading = true;
         state.error = null;
